@@ -442,7 +442,7 @@ Requires:
   ]).value('wysiwgGuiElements', {
     'bold': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -468,7 +468,7 @@ Requires:
     },
     'italic': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -494,7 +494,7 @@ Requires:
     },
     'underline': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -520,7 +520,7 @@ Requires:
     },
     'strikethrough': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -546,7 +546,7 @@ Requires:
     },
     'subscript': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -572,7 +572,7 @@ Requires:
     },
     'superscript': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -598,7 +598,7 @@ Requires:
     },
     'remove-format': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -620,7 +620,7 @@ Requires:
     },
     'ordered-list': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -646,7 +646,7 @@ Requires:
     },
     'unordered-list': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -672,7 +672,7 @@ Requires:
     },
     'outdent': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -694,7 +694,7 @@ Requires:
     },
     'indent': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -716,7 +716,7 @@ Requires:
     },
     'left-justify': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -742,7 +742,7 @@ Requires:
     },
     'center-justify': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -768,7 +768,7 @@ Requires:
     },
     'right-justify': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -794,7 +794,7 @@ Requires:
     },
     'code': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -820,7 +820,7 @@ Requires:
     },
     'quote': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -846,7 +846,7 @@ Requires:
     },
     'paragraph': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       text: 'P',
       attributes: [
         {
@@ -869,7 +869,7 @@ Requires:
     },
     'image': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -891,7 +891,7 @@ Requires:
     },
     'font-color': {
       tag: 'button',
-      classes: 'btn btn-default wysiwyg-colorpicker wysiwyg-fontcolor',
+      classes: 'btn wysiwyq-btn-default wysiwyg-colorpicker wysiwyg-fontcolor',
       text: 'A',
       attributes: [
         {
@@ -922,7 +922,7 @@ Requires:
     },
     'hilite-color': {
       tag: 'button',
-      classes: 'btn btn-default wysiwyg-colorpicker wysiwyg-fontcolor',
+      classes: 'btn wysiwyq-btn-default wysiwyg-colorpicker wysiwyg-fontcolor',
       text: 'H',
       attributes: [
         {
@@ -1019,7 +1019,7 @@ Requires:
     },
     'link': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
@@ -1045,7 +1045,7 @@ Requires:
     },
     'unlink': {
       tag: 'button',
-      classes: 'btn btn-default',
+      classes: 'btn wysiwyq-btn-default',
       attributes: [
         {
           name: 'title',
