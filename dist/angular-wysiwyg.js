@@ -896,7 +896,7 @@ Requires:
       attributes: [
         {
           name: 'title',
-          value: 'Font Color'
+          value: 'Font Colour'
         },
         {
           name: 'colorpicker',
@@ -927,7 +927,7 @@ Requires:
       attributes: [
         {
           name: 'title',
-          value: 'Hilite Color'
+          value: 'Highlight Colour'
         },
         {
           name: 'colorpicker',

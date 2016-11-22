@@ -845,7 +845,7 @@ Requires:
                 text: 'A',
                 attributes: [{
                     name: 'title',
-                    value: 'Font Color'
+                    value: 'Font Colour'
                 }, {
                     name: 'colorpicker',
                     value: 'rgba'
@@ -869,7 +869,7 @@ Requires:
                 text: 'H',
                 attributes: [{
                     name: 'title',
-                    value: 'Hilite Color'
+                    value: 'Highlight Colour'
                 }, {
                     name: 'colorpicker',
                     value: 'rgba'
