@@ -69,7 +69,7 @@ Requires:
     '$compile',
     function ($timeout, wysiwgGui, $compile) {
       return {
-        template: '<div>' + '<style>' + '   .wysiwyg-textarea[contentEditable="false"] { background-color:#eee}' + '   .wysiwyg-btn-group-margin { margin-right:5px; }' + '   .wysiwyg-select { height:30px;margin-bottom:1px;}' + '   .wysiwyg-colorpicker { font-family: arial, sans-serif !important;}' + '</style>' + '<div class="wysiwyg-menu"></div>' + '<div id="{{textareaId}}" ng-attr-style="resize:vertical;height:{{textareaHeight || \'80px\'}}; overflow:auto" contentEditable="{{!disabled}}" class="{{textareaClass}} wysiwyg-textarea" rows="{{textareaRows}}" name="{{textareaName}}" required="{{textareaRequired}}" placeholder="{{textareaPlaceholder}}" ng-model="value"></div>' + '</div>',
+        template: '<div>' + '<style>' + '   .wysiwyg-textarea[contentEditable="false"] { background-color:#eee}' + '   .wysiwyg-btn-group-margin { margin-right:5px; }' + '   .wysiwyg-select { height:30px;margin-bottom:1px;}' + '   .wysiwyg-colorpicker { font-family: arial, sans-serif !important;}' + '</style>' + '<div class="wysiwyg-menu"></div>' + '<div id="{{textareaId}}" ng-attr-style="resize:vertical;height:{{textareaHeight || \'80px\'}}; overflow:auto" contentEditable="{{!textareaDisabled}}" class="{{textareaClass}} wysiwyg-textarea" rows="{{textareaRows}}" name="{{textareaName}}" required="{{textareaRequired}}" placeholder="{{textareaPlaceholder}}" ng-model="value"></div>' + '</div>',
         restrict: 'E',
         scope: {
           value: '=ngModel',
@@ -81,7 +81,7 @@ Requires:
           textareaMenu: '=textareaMenu',
           textareaCustomMenu: '=textareaCustomMenu',
           fn: '&',
-          disabled: '=?disabled',
+          textareaDisabled: '=?textareaDisabled',
           styleWithCss: '=',
           enableObjResizing: '='
         },
@@ -191,13 +191,10 @@ Requires:
           $compile(menuDiv)(scope);
         }
         function configureDisabledWatch() {
-          scope.$watch('disabled', function (newValue) {
-            angular.element('div.wysiwyg-menu').find('button').each(function () {
-              angular.element(this).attr('disabled', newValue);
-            });
-            angular.element('div.wysiwyg-menu').find('select').each(function () {
-              angular.element(this).attr('disabled', newValue);
-            });
+          scope.$watch('textareaDisabled', function (newValue) {
+            var menu = angular.element('div.wysiwyg-menu');
+            menu.find('button').prop('disabled', newValue);
+            menu.find('select').prop('disabled', newValue);
           });
         }
         function configureBootstrapTitle() {

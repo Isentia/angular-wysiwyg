@@ -53,7 +53,7 @@ Requires:
                     '   .wysiwyg-colorpicker { font-family: arial, sans-serif !important;}' +
                     '</style>' +
                     '<div class="wysiwyg-menu"></div>' +
-                    '<div id="{{textareaId}}" ng-attr-style="resize:vertical;height:{{textareaHeight || \'80px\'}}; overflow:auto" contentEditable="{{!disabled}}" class="{{textareaClass}} wysiwyg-textarea" rows="{{textareaRows}}" name="{{textareaName}}" required="{{textareaRequired}}" placeholder="{{textareaPlaceholder}}" ng-model="value"></div>' +
+                    '<div id="{{textareaId}}" ng-attr-style="resize:vertical;height:{{textareaHeight || \'80px\'}}; overflow:auto" contentEditable="{{!textareaDisabled}}" class="{{textareaClass}} wysiwyg-textarea" rows="{{textareaRows}}" name="{{textareaName}}" required="{{textareaRequired}}" placeholder="{{textareaPlaceholder}}" ng-model="value"></div>' +
                     '</div>',
                 restrict: 'E',
                 scope: {
@@ -66,7 +66,7 @@ Requires:
                     textareaMenu: '=textareaMenu',
                     textareaCustomMenu: '=textareaCustomMenu',
                     fn: '&',
-                    disabled: '=?disabled',
+                    textareaDisabled: '=?textareaDisabled',
                     styleWithCss : '=',
                     enableObjResizing : "="
                 },
@@ -174,13 +174,11 @@ Requires:
                 }
 
                 function configureDisabledWatch() {
-                    scope.$watch('disabled', function(newValue) {
-                        angular.element('div.wysiwyg-menu').find('button').each(function() {
-                            angular.element(this).attr('disabled', newValue);
-                        });
-                        angular.element('div.wysiwyg-menu').find('select').each(function() {
-                            angular.element(this).attr('disabled', newValue);
-                        });
+                    scope.$watch('textareaDisabled', function(newValue) {
+                        var menu = angular.element('div.wysiwyg-menu');
+
+                        menu.find('button').prop('disabled', newValue);
+                        menu.find('select').prop('disabled', newValue);
                     });
                 }
 
