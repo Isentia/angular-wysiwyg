@@ -9,6 +9,8 @@ Usage: <wysiwyg textarea-id="question" textarea-class="form-control"  textarea-h
         textarea-menu           Array of Arrays that contain the groups of buttons to show Defualt:Show all button groups
         ng-model                The angular data model
         enable-bootstrap-title  True/False whether or not to show the button hover title styled with bootstrap
+        pastePlainText          True/False. Will interecept paste event and paste in plain text when rich text or HTML is pasted
+        pastePlainTextMode      If this is 'custom' then custom logic is used to strip out html tags. Otherwise default text is used which does not have line breaks.
 
 Requires:
     Twitter-bootstrap, fontawesome, jquery, angularjs, bootstrap-color-picker (https://github.com/buberdds/angular-bootstrap-colorpicker)
@@ -65,6 +67,8 @@ Requires:
                     textareaId: '@textareaId',
                     textareaMenu: '=textareaMenu',
                     textareaCustomMenu: '=textareaCustomMenu',
+                    pastePlainText: '=pastePlainText',
+                    pastePlainTextMode: '@pastePlainTextMode',
                     fn: '&',
                     textareaDisabled: '=?textareaDisabled',
                     styleWithCss : '=',
@@ -213,6 +217,29 @@ Requires:
 
                         ngModelController.$setViewValue(html);
                     });
+
+                    // Adding custom paste handler
+                    if (scope.pastePlainText == true || scope.pastePlainText == 'true') {
+                        textarea.on('paste', function(event) {
+                            // Get the text and html from clipboard
+                            var text = event.originalEvent.clipboardData.getData("text/plain");
+                            var html = event.originalEvent.clipboardData.getData("text/html");
+                            // If this was a plain text paste, we return from here and don't prevent the default handler from running
+                            if (!html) return;
+                            event.preventDefault();
+                            // if plain text mode is custom, we will apply our own custom processing on html to strip out tags
+                            // otherwise we paste the default plain text provided by the event. Please note that the default text also
+                            // strips out line breaks, so all text is pasted as one big paragraph with no line breaks
+                            if (scope.pastePlainTextMode == 'custom') {
+                                html = html.replace(/<style[^]*\/style>/gi, ''); // First remove the style tags
+                                html = html.replace(/(<.+?)( [^>]*)?>/gi, '$1>'); // now remove any attributes from tags
+                                html = html.replace(/<\/?(font|a|span|input)>/gi, ''); // now remove font, anchor and span tags
+                                document.execCommand("insertHTML", false, html);
+                            } else {
+                                document.execCommand("insertHTML", false, text);
+                            }
+                        });
+                    }
 
                     textarea.on('keydown', function(event){
                         if (event.keyCode == 9){

@@ -80,6 +80,7 @@ Requires:
           textareaId: '@textareaId',
           textareaMenu: '=textareaMenu',
           textareaCustomMenu: '=textareaCustomMenu',
+          pastePlainText: '=pastePlainText',
           fn: '&',
           textareaDisabled: '=?textareaDisabled',
           styleWithCss: '=',
@@ -219,6 +220,13 @@ Requires:
               html = '';
             }
             ngModelController.$setViewValue(html);
+          });
+          textarea.on('paste', function (event) {
+            event.preventDefault();
+            // get text representation of clipboard
+            var text = event.originalEvent.clipboardData.getData('text/plain');
+            // insert text manually
+            document.execCommand('insertHTML', false, text);
           });
           textarea.on('keydown', function (event) {
             if (event.keyCode == 9) {
