@@ -3,7 +3,7 @@ Angular WYSIWYG directive.
 ===========================
 
 
-![Awesome Shot] (https://raw.github.com/TerryMooreII/angular-wysiwyg/master/screenshots/screenshot.png)
+![Awesome Shot] (https://raw.github.com/isentia/angular-wysiwyg/master/screenshots/screenshot.png)
 
 
 Pull Requests Welcome
@@ -14,8 +14,8 @@ Demo
 ----
 
 ```
-$ git clone https://github.com/TerryMooreII/angular-wysiwyg.git
-$ npm install 
+$ git clone https://github.com/isentia/angular-wysiwyg.git
+$ npm install
 $ gulp server
 ```
 Open browser to http://localhost:4000/demo
@@ -44,8 +44,10 @@ angular.module('myapp', ['myApp.controllers', 'myApp.services', 'wysiwyg.module'
 Usage
 ------------
 ```html
-<wysiwyg textarea-id="question" textarea-class="form-control"  textarea-height="80px" textarea-name="textareaQuestion" textarea-required ng-model="yourModel.model" enable-bootstrap-title="true" textarea-menu="yourModel.customMenu"></wysiwyg>
+<wysiwyg textarea-id="question" textarea-class="form-control"  textarea-height="80px" textarea-name="textareaQuestion" textarea-required ng-model="yourModel.model" enable-bootstrap-title="true" textarea-menu="yourModel.customMenu" paste-plain-text=true paste-plain-text-mode='custom'></wysiwyg>
 ```
+
+
 Options
 -----------
 
@@ -62,6 +64,8 @@ Option|Description
 **textarea-disabled**  |          Disable the buttons and wysiwig area 
 **style-with-css**  |    true/false flag to set style with css or not, default is true if not set  
 **enable-obj-resizing**  |          true/false flag to set enable obj resizing or not, default is true if not set
+**paste-plain-text**  |          true/false flag to set enable interception of paste event and paste in plain text
+**paste-plain-text-mode**  |          'simple' or 'custom'. Simple uses default plain text handling of browser, and ignores linebreaks. custom uses a custom logic and clears out all emojis and tags except br tag
 
 Buttons
 --------------

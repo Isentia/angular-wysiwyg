@@ -9,6 +9,8 @@ Usage: <wysiwyg textarea-id="question" textarea-class="form-control"  textarea-h
         textarea-menu           Array of Arrays that contain the groups of buttons to show Defualt:Show all button groups
         ng-model                The angular data model
         enable-bootstrap-title  True/False whether or not to show the button hover title styled with bootstrap
+        pastePlainText          True/False. Will interecept paste event and paste in plain text when rich text or HTML is pasted
+        pastePlainTextMode      If this is 'custom' then custom logic is used to strip out html tags. Otherwise default text is used which does not have line breaks.
 
 Requires:
     Twitter-bootstrap, fontawesome, jquery, angularjs, bootstrap-color-picker (https://github.com/buberdds/angular-bootstrap-colorpicker)
@@ -65,6 +67,8 @@ Requires:
                     textareaId: '@textareaId',
                     textareaMenu: '=textareaMenu',
                     textareaCustomMenu: '=textareaCustomMenu',
+                    pastePlainText: '=pastePlainText',
+                    pastePlainTextMode: '@pastePlainTextMode',
                     fn: '&',
                     textareaDisabled: '=?textareaDisabled',
                     styleWithCss : '=',
@@ -213,6 +217,67 @@ Requires:
 
                         ngModelController.$setViewValue(html);
                     });
+
+                    function cleanupHtml(html) {
+                        if (/<body[^]*\/body>/i.test(html)) {
+                            var regMatch = html.match(/<body[^]*\/body>/gi); // First remove everything outside body tags
+                            if (regMatch && regMatch.length>0) {
+                                html = '';
+                                regMatch.forEach(function(str) {
+                                    html += (str + '\n');
+                                });
+                            }
+                        }
+                        html = html.replace(/<style[^]*\/style>/gi, ''); // remove the style tags including content
+                        html = html.replace(/<head[^]*\/head>/gi, ''); // head tags including content
+                        html = html.replace(/<meta[^]*\/meta>/gi, ''); // meta tags including content
+                        html = html.replace(/<!--[^]+?-->/gi, ''); // remove comments
+                        html = html.replace(/(<.+?)(\s[^>]*)?>/gi, '$1>'); // now remove any attributes from tags
+                        html = html.replace(/(&shy;)/gi, ' '); // Replacing soft hyphen and nbsp;
+                        html = html.replace(/(&nbsp;)/gi, ' '); // Replacing soft hyphen and nbsp;
+                        html = html.replace(/\r?\n/gi, ' '); // Replacing line breaks
+                        html = html.replace(/<p>/gi, '<br>'); // Replace p with br
+                        html = html.replace(/<li ?\/? ?>/gi, '<br>'); // Replace li with br
+                        html = html.replace(/<\/?(font|a|span|input|body|ul|li|p) ?\/?>/gi, ''); // now remove font, anchor and span tags but leave the content
+                        html = html.replace(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32-\ude3a]|[\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/gi, ''); // This regex matches emojis
+                        html = html.replace(/<(?!br)(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/gi, ''); // Replacing all tags except br
+                        html = html.replace(/<br>(\s<br>)*/gi, '<br>'); // Replacing multiple brs with one
+                        return html;
+                    }
+
+                    // Adding custom paste handler
+                    if (scope.pastePlainText === true || scope.pastePlainText == 'true') {
+                        textarea.on('paste', function(event) {
+                            // Kludge for IE, we will let the paste continue, and the 250 milliseconds later, we will change the model
+                            if (event.originalEvent.clipboardData===undefined) {
+                                setTimeout(function() {
+                                    var html = cleanupHtml(ngModelController.$viewValue);
+                                    ngModelController.$setViewValue(html);
+                                    ngModelController.$render();
+                                }, 250);
+                                // IE doesn't have preventDefault() so setting event.returnValue
+                                event.returnValue = false;
+                                return;
+                            }
+
+                            // Get the text and html from clipboard
+                            var text = event.originalEvent.clipboardData.getData("text/plain");
+                            var html = event.originalEvent.clipboardData.getData("text/html");
+
+                            // If this was a plain text paste, we return from here and don't prevent the default handler from running
+                            if (!html) return;
+                            event.preventDefault();
+                            // if plain text mode is custom, we will apply our own custom processing on html to strip out tags
+                            // otherwise we paste the default plain text provided by the event. Please note that the default text also
+                            // strips out line breaks, so all text is pasted as one big paragraph with no line breaks
+                            if (scope.pastePlainTextMode == 'custom') {
+                                html = cleanupHtml(html);
+                                document.execCommand("insertHTML", false, html);
+                            } else {
+                                document.execCommand("insertHTML", false, text);
+                            }
+                        });
+                    }
 
                     textarea.on('keydown', function(event){
                         if (event.keyCode == 9){
