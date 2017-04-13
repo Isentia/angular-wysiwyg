@@ -218,12 +218,47 @@ Requires:
                         ngModelController.$setViewValue(html);
                     });
 
+                    function cleanupHtml(html) {
+                        if (/<body[^]*\/body>/i.test(html)) {
+                            var regMatch = html.match(/<body[^]*\/body>/gi); // First remove everything outside body tags
+                            if (regMatch && regMatch.length>0) {
+                                html = '';
+                                regMatch.forEach(function(str) {
+                                    html += (str + '\n');
+                                });
+                            }
+                        }
+                        html = html.replace(/<style[^]*\/style>/gi, ''); // remove the style tags including content
+                        html = html.replace(/<head[^]*\/head>/gi, ''); // head tags including content
+                        html = html.replace(/<meta[^]*\/meta>/gi, ''); // meta tags including content
+                        html = html.replace(/<!--[^]+?-->/gi, ''); // remove comments
+                        html = html.replace(/(<.+?)(\s[^>]*)?>/gi, '$1>'); // now remove any attributes from tags
+                        html = html.replace(/<\/?(font|a|span|input|body) ?>/gi, ''); // now remove font, anchor and span tags but leave the content
+                        html = html.replace(/(&shy;)/gi, ' '); // Replacing soft hyphen and nbsp;
+                        html = html.replace(/(&nbsp;)/gi, ' '); // Replacing soft hyphen and nbsp;
+                        html = html.replace(/\r?\n/gi, ' '); // Replacing line breaks
+                        return html;
+                    }
+
                     // Adding custom paste handler
                     if (scope.pastePlainText == true || scope.pastePlainText == 'true') {
                         textarea.on('paste', function(event) {
+                            // Kludge for IE, we will let the paste continue, and the 250 milliseconds later, we will change the model
+                            if (event.originalEvent.clipboardData==undefined) {
+                                setTimeout(function() {
+                                    var html = cleanupHtml(ngModelController.$viewValue);
+                                    ngModelController.$setViewValue(html);
+                                    ngModelController.$render();
+                                }, 250);
+                                // IE doesn't have preventDefault() so setting event.returnValue
+                                event.returnValue = false;
+                                return;
+                            }
+
                             // Get the text and html from clipboard
                             var text = event.originalEvent.clipboardData.getData("text/plain");
                             var html = event.originalEvent.clipboardData.getData("text/html");
+
                             // If this was a plain text paste, we return from here and don't prevent the default handler from running
                             if (!html) return;
                             event.preventDefault();
@@ -231,9 +266,7 @@ Requires:
                             // otherwise we paste the default plain text provided by the event. Please note that the default text also
                             // strips out line breaks, so all text is pasted as one big paragraph with no line breaks
                             if (scope.pastePlainTextMode == 'custom') {
-                                html = html.replace(/<style[^]*\/style>/gi, ''); // First remove the style tags
-                                html = html.replace(/(<.+?)( [^>]*)?>/gi, '$1>'); // now remove any attributes from tags
-                                html = html.replace(/<\/?(font|a|span|input)>/gi, ''); // now remove font, anchor and span tags
+                                html = cleanupHtml(html);
                                 document.execCommand("insertHTML", false, html);
                             } else {
                                 document.execCommand("insertHTML", false, text);
