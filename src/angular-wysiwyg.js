@@ -233,10 +233,14 @@ Requires:
                         html = html.replace(/<meta[^]*\/meta>/gi, ''); // meta tags including content
                         html = html.replace(/<!--[^]+?-->/gi, ''); // remove comments
                         html = html.replace(/(<.+?)(\s[^>]*)?>/gi, '$1>'); // now remove any attributes from tags
-                        html = html.replace(/<\/?(font|a|span|input|body) ?>/gi, ''); // now remove font, anchor and span tags but leave the content
                         html = html.replace(/(&shy;)/gi, ' '); // Replacing soft hyphen and nbsp;
                         html = html.replace(/(&nbsp;)/gi, ' '); // Replacing soft hyphen and nbsp;
                         html = html.replace(/\r?\n/gi, ' '); // Replacing line breaks
+                        html = html.replace(/<p>/gi, '<br>'); // Replace p with br
+                        html = html.replace(/<li ?\/? ?>/gi, '<br>'); // Replace li with br
+                        html = html.replace(/<\/?(font|a|span|input|body|ul|li|p) ?\/?>/gi, ''); // now remove font, anchor and span tags but leave the content
+                        html = html.replace(/<(?!br)(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/gi, ''); // Replacing all tags except br
+                        html = html.replace(/<br>(\s<br>)*/gi, '<br>'); // Replacing multiple brs with one
                         return html;
                     }
 
