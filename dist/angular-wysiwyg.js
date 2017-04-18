@@ -256,10 +256,10 @@ Requires:
             return html;
           }
           // Adding custom paste handler
-          if (scope.pastePlainText == true || scope.pastePlainText == 'true') {
+          if (scope.pastePlainText === true || scope.pastePlainText == 'true') {
             textarea.on('paste', function (event) {
               // Kludge for IE, we will let the paste continue, and the 250 milliseconds later, we will change the model
-              if (event.originalEvent.clipboardData == undefined) {
+              if (event.originalEvent.clipboardData === undefined) {
                 setTimeout(function () {
                   var html = cleanupHtml(ngModelController.$viewValue);
                   ngModelController.$setViewValue(html);
