@@ -9,6 +9,8 @@ Usage: <wysiwyg textarea-id="question" textarea-class="form-control"  textarea-h
         textarea-menu           Array of Arrays that contain the groups of buttons to show Defualt:Show all button groups
         ng-model                The angular data model
         enable-bootstrap-title  True/False whether or not to show the button hover title styled with bootstrap
+        pastePlainText          True/False. Will interecept paste event and paste in plain text when rich text or HTML is pasted
+        pastePlainTextMode      If this is 'custom' then custom logic is used to strip out html tags. Otherwise default text is used which does not have line breaks.
 
 Requires:
     Twitter-bootstrap, fontawesome, jquery, angularjs, bootstrap-color-picker (https://github.com/buberdds/angular-bootstrap-colorpicker)
@@ -81,6 +83,7 @@ Requires:
           textareaMenu: '=textareaMenu',
           textareaCustomMenu: '=textareaCustomMenu',
           pastePlainText: '=pastePlainText',
+          pastePlainTextMode: '@pastePlainTextMode',
           fn: '&',
           textareaDisabled: '=?textareaDisabled',
           styleWithCss: '=',
@@ -221,13 +224,69 @@ Requires:
             }
             ngModelController.$setViewValue(html);
           });
-          textarea.on('paste', function (event) {
-            event.preventDefault();
-            // get text representation of clipboard
-            var text = event.originalEvent.clipboardData.getData('text/plain');
-            // insert text manually
-            document.execCommand('insertHTML', false, text);
-          });
+          function cleanupHtml(html) {
+            if (/<body[^]*\/body>/i.test(html)) {
+              var regMatch = html.match(/<body[^]*\/body>/gi);
+              // First remove everything outside body tags
+              if (regMatch && regMatch.length > 0) {
+                html = '';
+                regMatch.forEach(function (str) {
+                  html += str + '\n';
+                });
+              }
+            }
+            html = html.replace(/<style[^]*\/style>/gi, '');
+            // remove the style tags including content
+            html = html.replace(/<head[^]*\/head>/gi, '');
+            // head tags including content
+            html = html.replace(/<meta[^]*\/meta>/gi, '');
+            // meta tags including content
+            html = html.replace(/<!--[^]+?-->/gi, '');
+            // remove comments
+            html = html.replace(/(<.+?)(\s[^>]*)?>/gi, '$1>');
+            // now remove any attributes from tags
+            html = html.replace(/<\/?(font|a|span|input|body) ?>/gi, '');
+            // now remove font, anchor and span tags but leave the content
+            html = html.replace(/(&shy;)/gi, ' ');
+            // Replacing soft hyphen and nbsp;
+            html = html.replace(/(&nbsp;)/gi, ' ');
+            // Replacing soft hyphen and nbsp;
+            html = html.replace(/\r?\n/gi, ' ');
+            // Replacing line breaks
+            return html;
+          }
+          // Adding custom paste handler
+          if (scope.pastePlainText == true || scope.pastePlainText == 'true') {
+            textarea.on('paste', function (event) {
+              // Kludge for IE, we will let the paste continue, and the 250 milliseconds later, we will change the model
+              if (event.originalEvent.clipboardData == undefined) {
+                setTimeout(function () {
+                  var html = cleanupHtml(ngModelController.$viewValue);
+                  ngModelController.$setViewValue(html);
+                  ngModelController.$render();
+                }, 250);
+                // IE doesn't have preventDefault() so setting event.returnValue
+                event.returnValue = false;
+                return;
+              }
+              // Get the text and html from clipboard
+              var text = event.originalEvent.clipboardData.getData('text/plain');
+              var html = event.originalEvent.clipboardData.getData('text/html');
+              // If this was a plain text paste, we return from here and don't prevent the default handler from running
+              if (!html)
+                return;
+              event.preventDefault();
+              // if plain text mode is custom, we will apply our own custom processing on html to strip out tags
+              // otherwise we paste the default plain text provided by the event. Please note that the default text also
+              // strips out line breaks, so all text is pasted as one big paragraph with no line breaks
+              if (scope.pastePlainTextMode == 'custom') {
+                html = cleanupHtml(html);
+                document.execCommand('insertHTML', false, html);
+              } else {
+                document.execCommand('insertHTML', false, text);
+              }
+            });
+          }
           textarea.on('keydown', function (event) {
             if (event.keyCode == 9) {
               var TAB_SPACES = 4;
