@@ -241,6 +241,12 @@ Requires:
             s = s.replace(/\u2039/g, '');
             // spaces
             s = s.replace(/[\u02DC|\u00A0]/g, ' ');
+            // Other misc hyphens as outlined on https://www.cs.tut.fi/~jkorpela/dashes.html
+            s = s.replace(/[\u00AD|\u1806]/g, '');
+            // soft hyphen
+            s = s.replace(/[\u058A|\u05BE|\u2010|\u2011|\u2012|\u2015|\u2E3A|\u2E3B|\uFE58|\uFE63|\uFF0D]/g, '-');
+            // Different width spaces https://www.cs.tut.fi/~jkorpela/chars/spaces.html
+            s = s.replace(/[|\u00A0|\u180E|\u2000|\u2001|\u2002|\u2003|\u2004|\u2005|\u2006|\u2007|\u2008|\u2009|\u200A|\u200B|\u200D|\u202F|\u205F]/g, ' ');
             return s;
           }
           function cleanupHtml(html) {
@@ -280,21 +286,20 @@ Requires:
             // This regex matches emojis
             html = html.replace(/<(?!br)(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/gi, '');
             // Replacing all tags except br
-            html = html.replace(/<br>(\s<br>)*/gi, '<br>');
-            // Replacing multiple brs with one
+            // html = html.replace(/<br>(\s<br>)*/gi, '<br>'); // Replacing multiple brs with one
             html = replaceWordChars(html);
             return html;
           }
           // Adding custom paste handler
           if (scope.pastePlainText === true || scope.pastePlainText == 'true') {
             textarea.on('paste', function (event) {
-              // Kludge for IE, we will let the paste continue, and the 250 milliseconds later, we will change the model
+              // Kludge for IE, we will let the paste continue, and the 100 milliseconds later, we will change the model
               if (event.originalEvent.clipboardData === undefined) {
                 setTimeout(function () {
                   var html = cleanupHtml(ngModelController.$viewValue);
                   ngModelController.$setViewValue(html);
                   ngModelController.$render();
-                }, 250);
+                }, 100);
                 // IE doesn't have preventDefault() so setting event.returnValue
                 event.returnValue = false;
                 return;
@@ -302,17 +307,17 @@ Requires:
               // Get the text and html from clipboard
               var text = event.originalEvent.clipboardData.getData('text/plain');
               var html = event.originalEvent.clipboardData.getData('text/html');
-              // If this was a plain text paste, we return from here and don't prevent the default handler from running
-              if (!html)
-                return;
               event.preventDefault();
               // if plain text mode is custom, we will apply our own custom processing on html to strip out tags
               // otherwise we paste the default plain text provided by the event. Please note that the default text also
               // strips out line breaks, so all text is pasted as one big paragraph with no line breaks
-              if (scope.pastePlainTextMode == 'custom') {
+              if (html && scope.pastePlainTextMode == 'custom') {
                 html = cleanupHtml(html);
                 document.execCommand('insertHTML', false, html);
               } else {
+                // We need this substituion because if word is open in citrix, it only gives plain text in clipboard
+                // and we still get characters like $#8211 (em dash) going through to reports which screw up the formatting.
+                text = replaceWordChars(text);
                 document.execCommand('insertHTML', false, text);
               }
             });
