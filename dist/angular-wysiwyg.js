@@ -224,6 +224,25 @@ Requires:
             }
             ngModelController.$setViewValue(html);
           });
+          // http://blog.tatedavies.com/2012/08/28/replace-microsoft-chars-in-javascript/
+          function replaceWordChars(text) {
+            var s = text || '';
+            // smart single quotes and apostrophe
+            s = s.replace(/[\u2018|\u2019|\u201A]/g, '\'');
+            // smart double quotes
+            s = s.replace(/[\u201C|\u201D|\u201E]/g, '"');
+            // ellipsis
+            s = s.replace(/\u2026/g, '...');
+            // dashes
+            s = s.replace(/[\u2013|\u2014]/g, '-');
+            // circumflex
+            s = s.replace(/\u02C6/g, '^');
+            // open angle bracket
+            s = s.replace(/\u2039/g, '');
+            // spaces
+            s = s.replace(/[\u02DC|\u00A0]/g, ' ');
+            return s;
+          }
           function cleanupHtml(html) {
             if (/<body[^]*\/body>/i.test(html)) {
               var regMatch = html.match(/<body[^]*\/body>/gi);
@@ -263,6 +282,7 @@ Requires:
             // Replacing all tags except br
             html = html.replace(/<br>(\s<br>)*/gi, '<br>');
             // Replacing multiple brs with one
+            html = replaceWordChars(html);
             return html;
           }
           // Adding custom paste handler
